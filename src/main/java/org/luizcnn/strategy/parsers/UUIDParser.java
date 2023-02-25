@@ -1,6 +1,6 @@
-package org.luizcnn.factory.parsers;
+package org.luizcnn.strategy.parsers;
 
-import org.luizcnn.factory.ParserFunction;
+import org.luizcnn.strategy.ParserFunction;
 
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ public class UUIDParser implements ParserFunction<UUID> {
   }
 
   @Override
-  public UUID apply(String value) {
+  public UUID parse(String value) {
     return UUID.fromString(value);
   }
 }

@@ -1,6 +1,7 @@
-package org.luizcnn.factory;
+package org.luizcnn.strategy;
 
 @FunctionalInterface
 public interface ParserFunction<T> {
-  T apply(String value);
+  T parse(String value);
+
 }

@@ -1,6 +1,6 @@
-package org.luizcnn.factory.parsers;
+package org.luizcnn.strategy.parsers;
 
-import org.luizcnn.factory.ParserFunction;
+import org.luizcnn.strategy.ParserFunction;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -16,7 +16,7 @@ public class BigDecimalParser implements ParserFunction<BigDecimal> {
   }
 
   @Override
-  public BigDecimal apply(String value) {
+  public BigDecimal parse(String value) {
     return new BigDecimal(value, MathContext.DECIMAL64);
   }
 }

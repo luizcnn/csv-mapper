@@ -1,6 +1,6 @@
-package org.luizcnn.factory.parsers;
+package org.luizcnn.strategy.parsers;
 
-import org.luizcnn.factory.ParserFunction;
+import org.luizcnn.strategy.ParserFunction;
 
 public class FloatParser implements ParserFunction<Float> {
 
@@ -13,7 +13,7 @@ public class FloatParser implements ParserFunction<Float> {
   }
 
   @Override
-  public Float apply(String value) {
+  public Float parse(String value) {
     return Float.parseFloat(value);
   }
 }

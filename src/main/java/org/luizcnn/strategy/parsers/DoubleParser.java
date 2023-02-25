@@ -1,6 +1,6 @@
-package org.luizcnn.factory.parsers;
+package org.luizcnn.strategy.parsers;
 
-import org.luizcnn.factory.ParserFunction;
+import org.luizcnn.strategy.ParserFunction;
 
 public class DoubleParser implements ParserFunction<Double> {
 
@@ -13,7 +13,7 @@ public class DoubleParser implements ParserFunction<Double> {
   }
 
   @Override
-  public Double apply(String value) {
+  public Double parse(String value) {
     return Double.parseDouble(value);
   }
 }

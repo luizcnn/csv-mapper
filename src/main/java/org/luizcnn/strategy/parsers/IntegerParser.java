@@ -1,6 +1,6 @@
-package org.luizcnn.factory.parsers;
+package org.luizcnn.strategy.parsers;
 
-import org.luizcnn.factory.ParserFunction;
+import org.luizcnn.strategy.ParserFunction;
 
 public class IntegerParser implements ParserFunction<Integer> {
 
@@ -13,7 +13,7 @@ public class IntegerParser implements ParserFunction<Integer> {
   }
 
   @Override
-  public Integer apply(String value) {
+  public Integer parse(String value) {
     return Integer.parseInt(value);
   }
 }

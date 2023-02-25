@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.luizcnn.factory.ParserFunctionFactory.getParserFunction;
+import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
 public class CsvProcessor<T extends CsvSchema> {
 
@@ -31,8 +31,7 @@ public class CsvProcessor<T extends CsvSchema> {
       csvHeaders.forEach(header -> {
         int position = header.position();
         final var value = rowAsList.get(position);
-        parameters[position] = getParserFunction(header.type())
-                .apply(value);
+        parameters[position] = getParserFunction(header.type()).parse(value);
       });
       try {
         final var instance = objectConstructor.newInstance(parameters);

@@ -1,6 +1,6 @@
-package org.luizcnn.factory.parsers;
+package org.luizcnn.strategy.parsers;
 
-import org.luizcnn.factory.ParserFunction;
+import org.luizcnn.strategy.ParserFunction;
 
 public class StringParser implements ParserFunction<String> {
 
@@ -13,7 +13,7 @@ public class StringParser implements ParserFunction<String> {
   }
 
   @Override
-  public String apply(String value) {
+  public String parse(String value) {
     return value;
   }
 }

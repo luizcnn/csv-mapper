@@ -1,6 +1,6 @@
-package org.luizcnn.factory.parsers;
+package org.luizcnn.strategy.parsers;
 
-import org.luizcnn.factory.ParserFunction;
+import org.luizcnn.strategy.ParserFunction;
 
 public class BooleanParser implements ParserFunction<Boolean> {
 
@@ -13,7 +13,7 @@ public class BooleanParser implements ParserFunction<Boolean> {
   }
 
   @Override
-  public Boolean apply(String value) {
+  public Boolean parse(String value) {
     return Boolean.valueOf(value);
   }
 }
