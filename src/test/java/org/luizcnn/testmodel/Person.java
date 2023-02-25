@@ -27,5 +27,5 @@ public class Person {
   @CsvHeader(name = "saldo", position = 5)
   private BigDecimal balance;
 
-  private String notMappedField = "Not mapped";
+  private String notMappedField;
 }

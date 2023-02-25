@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.luizcnn.utils.io.CsvReader.readCsvFrom;
 
 class CsvMapperTest {
@@ -54,6 +55,6 @@ class CsvMapperTest {
     assertEquals(expectedPerson.getId(), person.getId());
     assertEquals(expectedPerson.getBalance(), person.getBalance());
     assertEquals(expectedPerson.getIsRegistered(), person.getIsRegistered());
-    assertEquals("Not mapped", person.getNotMappedField());
+    assertNull(person.getNotMappedField());
   }
 }
