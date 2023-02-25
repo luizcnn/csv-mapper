@@ -1,4 +1,4 @@
-package org.luizcnn.processor;
+package org.luizcnn.mapper;
 
 import org.luizcnn.annotations.CsvHeader;
 import org.luizcnn.models.CsvSchema;
@@ -13,7 +13,9 @@ import java.util.stream.Stream;
 
 import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
-public class CsvProcessor<T extends CsvSchema> {
+public class CsvMapper<T extends CsvSchema> {
+
+  //TODO try to implement a singleton of this class
 
   public List<T> process(String csv, Class<T> targetClass) {
     List<T> result = new ArrayList<>();
