@@ -26,4 +26,6 @@ public class Person {
   private Boolean isRegistered;
   @CsvHeader(name = "saldo", position = 5)
   private BigDecimal balance;
+
+  private String notMappedField = "Not mapped";
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.nonNull;
 import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -26,11 +27,10 @@ public class CsvMapper {
 
   public <T> List<T> process(String csv, Class<T> targetClass) {
     List<T> result = new ArrayList<>();
+
+    final var csvAsList = getCsvAsList(csv);
     final var csvHeaders = getCsvHeaders(targetClass);
     Constructor<T> objectConstructor = getTargetNoArgsConstructor(targetClass);
-    final var csvAsList = Arrays.stream(csv.trim().split("\n"))
-            .map(row -> Arrays.asList(row.split(",")))
-            .collect(Collectors.toList());
 
     validateHeadersPositions(csvAsList, csvHeaders);
 
@@ -49,6 +49,12 @@ public class CsvMapper {
     return result;
   }
 
+  private static List<List<String>> getCsvAsList(String csv) {
+    return Arrays.stream(csv.trim().split("\n"))
+            .map(row -> Arrays.asList(row.split(",")))
+            .collect(Collectors.toList());
+  }
+
   private static <T> List<MapperHelper> getCsvHeaders(Class<T> targetClass) {
     return Stream
             .of(targetClass.getDeclaredFields())
@@ -58,6 +64,7 @@ public class CsvMapper {
                     .annotation(field.getAnnotation(CsvHeader.class))
                     .build()
             )
+            .filter(helper -> nonNull(helper.getAnnotation()))
             .collect(Collectors.toList());
   }
 

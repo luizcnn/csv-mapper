@@ -54,5 +54,6 @@ class CsvMapperTest {
     assertEquals(expectedPerson.getId(), person.getId());
     assertEquals(expectedPerson.getBalance(), person.getBalance());
     assertEquals(expectedPerson.getIsRegistered(), person.getIsRegistered());
+    assertEquals("Not mapped", person.getNotMappedField());
   }
 }
