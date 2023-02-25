@@ -1,12 +1,13 @@
 package org.luizcnn.strategy.parsers;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.luizcnn.strategy.ParserFunction;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FloatParser implements ParserFunction<Float> {
 
   private static final FloatParser INSTANCE = new FloatParser();
-
-  private FloatParser() {}
 
   public static FloatParser getInstance() {
     return INSTANCE;

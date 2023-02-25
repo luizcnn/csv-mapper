@@ -3,10 +3,8 @@ package org.luizcnn;
 public class Main {
   public static void main(String[] args) {
     //TODO
-    // Try to found a way to an CsvSchema class has to implements all args constructor or the setters methods;
     // Create an CsvIgnore annotation to ignore fields in mapper
-    // Another way to set attributes without using constructors is
-    // TestVO.class.getDeclaredField("attribute").set(testVoInstance, value)
-    // Try to found a way to remove redundancy into @CsvSchema type field and the type of class attribute.
+    // Create a class annotation to model which tells the algorithm how is the csv structure (just comma separated, with/without quotes, etc.)
+    // Try to remove dependency of position with mapping the csv as List<Map<String, String>> instead List<List<String>>
   }
 }

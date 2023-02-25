@@ -1,6 +1,9 @@
 package org.luizcnn.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.luizcnn.annotations.CsvHeader;
+import org.luizcnn.exceptions.MissingNoArgsConstructorException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -12,11 +15,10 @@ import java.util.stream.Stream;
 
 import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CsvMapper {
 
   private static final CsvMapper INSTANCE = new CsvMapper();
-
-  private CsvMapper() {}
 
   public static CsvMapper getInstance() {
     return INSTANCE;
@@ -25,57 +27,59 @@ public class CsvMapper {
   public <T> List<T> process(String csv, Class<T> targetClass) {
     List<T> result = new ArrayList<>();
     final var csvHeaders = getCsvHeaders(targetClass);
-    Constructor<T> objectConstructor = getTargetConstructor(targetClass);
+    Constructor<T> objectConstructor = getTargetNoArgsConstructor(targetClass);
     final var csvAsList = Arrays.stream(csv.trim().split("\n"))
             .map(row -> Arrays.asList(row.split(",")))
             .collect(Collectors.toList());
 
     validateHeadersPositions(csvAsList, csvHeaders);
+
     csvAsList.forEach(rowAsList -> {
-      final var parameters = new Object[csvHeaders.size()];
-      csvHeaders.forEach(header -> {
-        int position = header.position();
+      final var mappedObject = constructInstance(objectConstructor);
+      csvHeaders.forEach(helper -> {
+        final var csvHeaderAnnotation = (CsvHeader) helper.getAnnotation();
+        final var field = helper.getField();
+        int position = csvHeaderAnnotation.position();
         final var value = rowAsList.get(position);
-        parameters[position] = getParserFunction(header.type()).parse(value);
+        setFieldValueIntoMappedObject(mappedObject, field, value);
       });
-      result.add(constructInstance(objectConstructor, parameters));
+      result.add(mappedObject);
     });
 
     return result;
   }
 
-  private static <T> T constructInstance(Constructor<T> objectConstructor, Object[] parameters) {
-    try {
-      return objectConstructor.newInstance(parameters);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private <T> Constructor<T> getTargetConstructor(Class<T> targetClass) {
-    try {
-      return targetClass.getConstructor(
-              Arrays.stream(targetClass.getDeclaredFields())
-                      .map(Field::getType)
-                      .toArray(Class[]::new)
-      );
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private <T> List<CsvHeader> getCsvHeaders(Class<T> targetClass) {
+  private static <T> List<MapperHelper> getCsvHeaders(Class<T> targetClass) {
     return Stream
             .of(targetClass.getDeclaredFields())
-            .map(field -> field.getAnnotation(CsvHeader.class))
+            .map(field -> MapperHelper
+                    .builder()
+                    .field(field)
+                    .annotation(field.getAnnotation(CsvHeader.class))
+                    .build()
+            )
             .collect(Collectors.toList());
   }
 
-  private static void validateHeadersPositions(List<List<String>> csvAsList, List<CsvHeader> headers) {
+  private static <T> Constructor<T> getTargetNoArgsConstructor(Class<T> targetClass) {
+    try {
+      return targetClass.getConstructor();
+    } catch (NoSuchMethodException e) {
+      throw new MissingNoArgsConstructorException(e);
+    }
+  }
+
+  /*
+    This validation will be removed when header position do not be no longer important
+   */
+  @Deprecated
+  private static void validateHeadersPositions(List<List<String>> csvAsList, List<MapperHelper> headers) {
     final var validator = headers
             .stream()
+            .map(helper -> (CsvHeader) helper.getAnnotation())
             .map(CsvHeader::name)
             .collect(Collectors.toList());
+
     final var csvHeaders = csvAsList.get(0);
     for(int i = 0; i < csvHeaders.size(); i++) {
       if (!csvHeaders.get(i).equals(validator.get(i))) {
@@ -83,6 +87,23 @@ public class CsvMapper {
       }
     }
     csvAsList.remove(0); //removing header after pass successfully through validation
+  }
+
+  private static <T> T constructInstance(Constructor<T> objectConstructor) {
+    try {
+      return objectConstructor.newInstance();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static <T> void setFieldValueIntoMappedObject(T mappedObject, Field field, String value) {
+    try {
+      field.setAccessible(true);
+      field.set(mappedObject, getParserFunction(field.getType()).parse(value));
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

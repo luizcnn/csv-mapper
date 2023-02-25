@@ -17,6 +17,4 @@ public @interface CsvHeader {
 
   int position();
 
-  Class type();
-
 }
