@@ -38,15 +38,18 @@ public class CsvMapper {
         final var value = rowAsList.get(position);
         parameters[position] = getParserFunction(header.type()).parse(value);
       });
-      try {
-        final var instance = objectConstructor.newInstance(parameters);
-        result.add(instance);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
+      result.add(constructInstance(objectConstructor, parameters));
     });
 
     return result;
+  }
+
+  private static <T> T constructInstance(Constructor<T> objectConstructor, Object[] parameters) {
+    try {
+      return objectConstructor.newInstance(parameters);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private <T> Constructor<T> getTargetConstructor(Class<T> targetClass) {
