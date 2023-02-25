@@ -14,7 +14,7 @@ import static org.luizcnn.utils.io.CsvReader.readCsvFrom;
 
 class CsvMapperTest {
 
-  private final CsvMapper<Person> csvMapper = new CsvMapper<>();
+//  private final CsvMapper csvMapper = new CsvMapper();
 
   private static final Path TEST_DATA_PATH = Path.of("src", "test", "resources", "test-data");
 
@@ -27,7 +27,7 @@ class CsvMapperTest {
     final var csvContent = readCsvFrom(TEST_DATA_PATH, "person.csv");
 
     //act
-    final var persons = csvMapper.process(csvContent, Person.class);
+    final var persons = CsvMapper.getInstance().process(csvContent, Person.class);
 
     //asserts
     assertNotNull(persons);

@@ -13,11 +13,19 @@ import java.util.stream.Stream;
 
 import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
-public class CsvMapper<T extends CsvSchema> {
+public class CsvMapper {
 
   //TODO try to implement a singleton of this class
 
-  public List<T> process(String csv, Class<T> targetClass) {
+  private static final CsvMapper INSTANCE = new CsvMapper();
+
+  private CsvMapper() {}
+
+  public static CsvMapper getInstance() {
+    return INSTANCE;
+  }
+
+  public <T extends CsvSchema> List<T> process(String csv, Class<T> targetClass) {
     List<T> result = new ArrayList<>();
     final var csvHeaders = getCsvHeaders(targetClass);
     Constructor<T> objectConstructor = getTargetConstructor(targetClass);
@@ -46,7 +54,7 @@ public class CsvMapper<T extends CsvSchema> {
     return result;
   }
 
-  private Constructor<T> getTargetConstructor(Class<T> targetClass) {
+  private <T> Constructor<T> getTargetConstructor(Class<T> targetClass) {
     try {
       return targetClass.getConstructor(
               Arrays.stream(targetClass.getDeclaredFields())
@@ -58,7 +66,7 @@ public class CsvMapper<T extends CsvSchema> {
     }
   }
 
-  private List<CsvHeader> getCsvHeaders(Class<T> targetClass) {
+  private <T> List<CsvHeader> getCsvHeaders(Class<T> targetClass) {
     return Stream
             .of(targetClass.getDeclaredFields())
             .map(field -> field.getAnnotation(CsvHeader.class))
