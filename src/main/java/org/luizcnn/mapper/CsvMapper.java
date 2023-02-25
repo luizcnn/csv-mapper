@@ -1,7 +1,6 @@
 package org.luizcnn.mapper;
 
 import org.luizcnn.annotations.CsvHeader;
-import org.luizcnn.models.CsvSchema;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -23,7 +22,7 @@ public class CsvMapper {
     return INSTANCE;
   }
 
-  public <T extends CsvSchema> List<T> process(String csv, Class<T> targetClass) {
+  public <T> List<T> process(String csv, Class<T> targetClass) {
     List<T> result = new ArrayList<>();
     final var csvHeaders = getCsvHeaders(targetClass);
     Constructor<T> objectConstructor = getTargetConstructor(targetClass);

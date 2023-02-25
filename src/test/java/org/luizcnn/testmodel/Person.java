@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.luizcnn.annotations.CsvHeader;
-import org.luizcnn.models.CsvSchema;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -14,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Person implements CsvSchema {
+public class Person {
   @CsvHeader(name = "id", position = 0, type = UUID.class)
   private UUID id;
   @CsvHeader(name = "nome", position = 1, type = String.class)
