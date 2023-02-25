@@ -14,8 +14,6 @@ import static org.luizcnn.utils.io.CsvReader.readCsvFrom;
 
 class CsvMapperTest {
 
-//  private final CsvMapper csvMapper = new CsvMapper();
-
   private static final Path TEST_DATA_PATH = Path.of("src", "test", "resources", "test-data");
 
   @Test

@@ -15,8 +15,6 @@ import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
 public class CsvMapper {
 
-  //TODO try to implement a singleton of this class
-
   private static final CsvMapper INSTANCE = new CsvMapper();
 
   private CsvMapper() {}
