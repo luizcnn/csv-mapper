@@ -31,10 +31,8 @@ public class CsvMapper {
             .map(row -> Arrays.asList(row.split(",")))
             .collect(Collectors.toList());
 
-    validateHeadersPositions(csvAsList.get(0), csvHeaders);
-
-    for(int i = 1; i < csvAsList.size(); i++) { //Skipping header of csv.
-      final var rowAsList = csvAsList.get(i);
+    validateHeadersPositions(csvAsList, csvHeaders);
+    csvAsList.forEach(rowAsList -> {
       final var parameters = new Object[csvHeaders.size()];
       csvHeaders.forEach(header -> {
         int position = header.position();
@@ -47,7 +45,7 @@ public class CsvMapper {
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
-    }
+    });
 
     return result;
   }
@@ -71,17 +69,18 @@ public class CsvMapper {
             .collect(Collectors.toList());
   }
 
-  private static void validateHeadersPositions(List<String> csvHeaders, List<CsvHeader> headers) {
+  private static void validateHeadersPositions(List<List<String>> csvAsList, List<CsvHeader> headers) {
     final var validator = headers
             .stream()
             .map(CsvHeader::name)
             .collect(Collectors.toList());
-
+    final var csvHeaders = csvAsList.get(0);
     for(int i = 0; i < csvHeaders.size(); i++) {
       if (!csvHeaders.get(i).equals(validator.get(i))) {
         throw new RuntimeException("CSV file headers does not correspond to Schema. CsvSchemaHeaders:" + headers);
       }
     }
+    csvAsList.remove(0); //removing header after pass successfully through validation
   }
 
 }
