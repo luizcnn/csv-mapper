@@ -11,10 +11,8 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface CsvHeader {
+public @interface CsvProperty {
 
-  String name();
-
-  int position();
+  String name() default "";
 
 }

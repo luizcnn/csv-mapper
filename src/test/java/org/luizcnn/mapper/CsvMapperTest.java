@@ -6,12 +6,12 @@ import org.luizcnn.testmodel.Person;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.luizcnn.utils.io.CsvReader.readCsvFrom;
+import static org.luizcnn.utils.template.PersonTemplate.buildPerson;
 
 class CsvMapperTest {
 
@@ -36,17 +36,6 @@ class CsvMapperTest {
       final var person = persons.get(i);
       assertPersons(expectedPerson, person);
     }
-  }
-
-  private Person buildPerson(String name, Integer age, BigDecimal balance, boolean isRegistered) {
-    return Person.builder()
-            .id(UUID.nameUUIDFromBytes(name.getBytes()))
-            .name(name)
-            .email(name.concat("@email.com"))
-            .age(age)
-            .isRegistered(isRegistered)
-            .balance(balance)
-            .build();
   }
 
   private static void assertPersons(Person expectedPerson, Person person) {

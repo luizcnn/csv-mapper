@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.luizcnn.annotations.CsvHeader;
+import org.luizcnn.annotations.CsvProperty;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -14,17 +14,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Person {
-  @CsvHeader(name = "id", position = 0)
+  @CsvProperty
   private UUID id;
-  @CsvHeader(name = "nome", position = 1)
+  @CsvProperty(name = "nome")
   private String name;
-  @CsvHeader(name = "email", position = 2)
+  @CsvProperty
   private String email;
-  @CsvHeader(name = "idade", position = 3)
+  @CsvProperty(name = "idade")
   private int age;
-  @CsvHeader(name = "ehRegistrado", position = 4)
+  @CsvProperty(name = "ehRegistrado")
   private Boolean isRegistered;
-  @CsvHeader(name = "saldo", position = 5)
+  @CsvProperty(name = "saldo")
   private BigDecimal balance;
 
   private String notMappedField;

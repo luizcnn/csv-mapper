@@ -2,18 +2,19 @@ package org.luizcnn.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.luizcnn.annotations.CsvHeader;
+import org.luizcnn.annotations.CsvProperty;
 import org.luizcnn.exceptions.MissingNoArgsConstructorException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.luizcnn.parser.CsvParser.parseCsvAsListOfMap;
 import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -28,19 +29,19 @@ public class CsvMapper {
   public <T> List<T> process(String csv, Class<T> targetClass) {
     List<T> result = new ArrayList<>();
 
-    final var csvAsList = getCsvAsList(csv);
-    final var csvHeaders = getCsvHeaders(targetClass);
+    final var csvAsList = parseCsvAsListOfMap(csv);
+    final var csvHeaders = getMapperHelper(targetClass);
     Constructor<T> objectConstructor = getTargetNoArgsConstructor(targetClass);
-
-    validateHeadersPositions(csvAsList, csvHeaders);
 
     csvAsList.forEach(rowAsList -> {
       final var mappedObject = constructInstance(objectConstructor);
       csvHeaders.forEach(helper -> {
-        final var csvHeaderAnnotation = (CsvHeader) helper.getAnnotation();
+        final var csvHeaderAnnotation = (CsvProperty) helper.getAnnotation();
         final var field = helper.getField();
-        int position = csvHeaderAnnotation.position();
-        final var value = rowAsList.get(position);
+        final var mapKey = isCsvHeaderNameNullOrBlank(csvHeaderAnnotation)
+                ? field.getName()
+                : csvHeaderAnnotation.name();
+        final var value = rowAsList.get(mapKey);
         setFieldValueIntoMappedObject(mappedObject, field, value);
       });
       result.add(mappedObject);
@@ -49,19 +50,13 @@ public class CsvMapper {
     return result;
   }
 
-  private static List<List<String>> getCsvAsList(String csv) {
-    return Arrays.stream(csv.trim().split("\n"))
-            .map(row -> Arrays.asList(row.split(",")))
-            .collect(Collectors.toList());
-  }
-
-  private static <T> List<MapperHelper> getCsvHeaders(Class<T> targetClass) {
+  private static <T> List<MapperHelper> getMapperHelper(Class<T> targetClass) {
     return Stream
             .of(targetClass.getDeclaredFields())
             .map(field -> MapperHelper
                     .builder()
                     .field(field)
-                    .annotation(field.getAnnotation(CsvHeader.class))
+                    .annotation(field.getAnnotation(CsvProperty.class))
                     .build()
             )
             .filter(helper -> nonNull(helper.getAnnotation()))
@@ -76,32 +71,16 @@ public class CsvMapper {
     }
   }
 
-  /*
-    This validation will be removed when header position do not be no longer important
-   */
-  @Deprecated
-  private static void validateHeadersPositions(List<List<String>> csvAsList, List<MapperHelper> headers) {
-    final var validator = headers
-            .stream()
-            .map(helper -> (CsvHeader) helper.getAnnotation())
-            .map(CsvHeader::name)
-            .collect(Collectors.toList());
-
-    final var csvHeaders = csvAsList.get(0);
-    for(int i = 0; i < csvHeaders.size(); i++) {
-      if (!csvHeaders.get(i).equals(validator.get(i))) {
-        throw new RuntimeException("CSV file headers does not correspond to Schema. CsvSchemaHeaders:" + headers);
-      }
-    }
-    csvAsList.remove(0); //removing header after pass successfully through validation
-  }
-
   private static <T> T constructInstance(Constructor<T> objectConstructor) {
     try {
       return objectConstructor.newInstance();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static boolean isCsvHeaderNameNullOrBlank(CsvProperty csvPropertyAnnotation) {
+    return isNull(csvPropertyAnnotation.name()) || csvPropertyAnnotation.name().isBlank();
   }
 
   private static <T> void setFieldValueIntoMappedObject(T mappedObject, Field field, String value) {
