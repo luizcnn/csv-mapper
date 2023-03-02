@@ -1,4 +1,4 @@
-package org.luizcnn.parser;
+package org.luizcnn.csvparser;
 
 import java.util.ArrayList;
 import java.util.Arrays;

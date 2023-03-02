@@ -1,37 +1,30 @@
 package org.luizcnn.strategy;
 
-import org.luizcnn.exceptions.ParserNotFoundException;
-import org.luizcnn.strategy.parsers.BigDecimalParser;
-import org.luizcnn.strategy.parsers.BooleanParser;
-import org.luizcnn.strategy.parsers.DoubleParser;
-import org.luizcnn.strategy.parsers.FloatParser;
-import org.luizcnn.strategy.parsers.IntegerParser;
-import org.luizcnn.strategy.parsers.StringParser;
-import org.luizcnn.strategy.parsers.UUIDParser;
+import org.luizcnn.annotations.CsvPropertyParser;
+import org.luizcnn.strategy.factory.DefaultParserFactory;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 
 public class ParserFunctionStrategy {
 
-  public static ParserFunction<?> getParserFunction(Class<?> target) {
-    if (String.class.equals(target)) {
-      return StringParser.getInstance();
-    } else if (Integer.class.equals(target) || int.class.equals(target)) {
-      return IntegerParser.getInstance();
-    } else if (Double.class.equals(target) || double.class.equals(target)) {
-      return DoubleParser.getInstance();
-    } else if (Float.class.equals(target) || float.class.equals(target)) {
-      return FloatParser.getInstance();
-    } else if (Boolean.class.equals(target) || boolean.class.equals(target)) {
-      return BooleanParser.getInstance();
-    } else if (UUID.class.equals(target)) {
-      return UUIDParser.getInstance();
-    } else if (BigDecimal.class.equals(target)) {
-      return BigDecimalParser.getInstance();
-    } else {
-      throw new ParserNotFoundException(String.format("Does not exists parser function for %s", target));
+  public static ParserFunction<?> getParserFunction(Field field) {
+    final var parser = ofNullable(field.getDeclaredAnnotation(CsvPropertyParser.class))
+            .map(CsvPropertyParser::using)
+            .orElse(null);
+    if (nonNull(parser)) {
+      try {
+        final var customParserConstructor = parser.getDeclaredConstructor();
+        customParserConstructor.setAccessible(true);
+        return customParserConstructor.newInstance();
+      } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
     }
+    return DefaultParserFactory.getByFieldType(field.getType());
   }
 
 }

@@ -5,30 +5,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.luizcnn.annotations.CsvProperty;
+import org.luizcnn.annotations.CsvPropertyParser;
+import org.luizcnn.customparsers.BrazilianLocalDateParser;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Person {
-  @CsvProperty
-  private UUID id;
+public class BrazilianPerson {
+
   @CsvProperty(name = "nome")
   private String name;
-  @CsvProperty
-  private String email;
-  @CsvProperty(name = "idade")
-  private int age;
-  @CsvProperty(name = "ehRegistrado")
-  private Boolean isRegistered;
-  @CsvProperty(name = "saldo")
-  private BigDecimal balance;
+
   @CsvProperty(name = "dataNascimento")
+  @CsvPropertyParser(using = BrazilianLocalDateParser.class)
   private LocalDate birthDate;
 
-  private String notMappedField;
 }

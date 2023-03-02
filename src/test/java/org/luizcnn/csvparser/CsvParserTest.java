@@ -1,9 +1,10 @@
-package org.luizcnn.parser;
+package org.luizcnn.csvparser;
 
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,8 +19,12 @@ class CsvParserTest {
   @Test
   public void shouldConvertCSVIntoListOfMap() {
     //arrange
-    final var firstPerson = buildPerson("joaozinho", 19, BigDecimal.valueOf(10.21), true);
-    final var secondPerson = buildPerson("maria", 34, BigDecimal.valueOf(42.23), false);
+    final var firstPerson = buildPerson(
+            "joaozinho", 19, BigDecimal.valueOf(10.21), true, LocalDate.of(2004,2,23)
+    );
+    final var secondPerson = buildPerson(
+            "maria", 34, BigDecimal.valueOf(42.23), false, LocalDate.of(1989,3,1)
+    );
     final var expectedPersons = List.of(firstPerson, secondPerson);
     final var csvContent = readCsvFrom(TEST_DATA_PATH, "person.csv");
 

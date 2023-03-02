@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.luizcnn.parser.CsvParser.parseCsvAsListOfMap;
+import static org.luizcnn.csvparser.CsvParser.parseCsvAsListOfMap;
 import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -86,8 +86,8 @@ public class CsvMapper {
   private static <T> void setFieldValueIntoMappedObject(T mappedObject, Field field, String value) {
     try {
       field.setAccessible(true);
-      field.set(mappedObject, getParserFunction(field.getType()).parse(value));
-    } catch (IllegalAccessException e) {
+      field.set(mappedObject, getParserFunction(field).parse(value));
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }

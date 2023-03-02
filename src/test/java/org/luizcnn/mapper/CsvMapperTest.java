@@ -1,10 +1,12 @@
 package org.luizcnn.mapper;
 
 import org.junit.jupiter.api.Test;
+import org.luizcnn.testmodel.BrazilianPerson;
 import org.luizcnn.testmodel.Person;
 
 import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,8 +22,12 @@ class CsvMapperTest {
   @Test
   public void shouldMapCsvWithinDataOfPersonsIntoAListOfPersonModel() {
     //arrange
-    final var firstPerson = buildPerson("joaozinho", 19, BigDecimal.valueOf(10.21), true);
-    final var secondPerson = buildPerson("maria", 34, BigDecimal.valueOf(42.23), false);
+    final var firstPerson = buildPerson(
+            "joaozinho", 19, BigDecimal.valueOf(10.21), true, LocalDate.of(2004,2,23)
+    );
+    final var secondPerson = buildPerson(
+            "maria", 34, BigDecimal.valueOf(42.23), false, LocalDate.of(1989,3,1)
+    );
     final var expectedPersons = List.of(firstPerson, secondPerson);
     final var csvContent = readCsvFrom(TEST_DATA_PATH, "person.csv");
 
@@ -35,6 +41,36 @@ class CsvMapperTest {
       final var expectedPerson = expectedPersons.get(i);
       final var person = persons.get(i);
       assertPersons(expectedPerson, person);
+    }
+  }
+
+  @Test
+  public void shouldMapCsvWithinDataOfPersonsIntoAListOfPersonBrazilianBirthdateModel() {
+    //arrange
+    final var firstPerson = BrazilianPerson
+            .builder()
+            .name("joaozinho")
+            .birthDate(LocalDate.of(2004,2,23))
+            .build();
+    final var secondPerson = BrazilianPerson
+            .builder()
+            .name("maria")
+            .birthDate(LocalDate.of(1989,3,1))
+            .build();
+    final var expectedPersons = List.of(firstPerson, secondPerson);
+    final var csvContent = readCsvFrom(TEST_DATA_PATH, "brazilian-person.csv");
+
+    //act
+    final var persons = CsvMapper.getInstance().process(csvContent, BrazilianPerson.class);
+
+    //asserts
+    assertNotNull(persons);
+    assertEquals(2, persons.size());
+    for (int i = 0; i < persons.size(); i++) {
+      final var expectedPerson = expectedPersons.get(i);
+      final var person = persons.get(i);
+      assertEquals(expectedPerson.getName(), person.getName());
+      assertEquals(expectedPerson.getBirthDate(), person.getBirthDate());
     }
   }
 
