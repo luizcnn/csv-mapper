@@ -39,7 +39,12 @@ public final class DefaultParserFactory {
     } else if (LocalDateTime.class.equals(fieldType)) {
       return LocalDateTimeParser.getInstance();
     } else {
-      throw new ParserNotFoundException(String.format("Does not exists parser function for %s", fieldType));
+      throw new ParserNotFoundException(
+              String.format(
+                  "Does not exists parser function for %s. You could create a custom parser using @CsvPropertyParser",
+                  fieldType
+              )
+      );
     }
   }
 
