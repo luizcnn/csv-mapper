@@ -76,12 +76,16 @@ public class CsvMapper {
       try (final CSVPrinter printer = new CSVPrinter(sw, csvFormat)) {
         value.forEach(it -> {
           try {
-            final Object[] test = Arrays.stream(it.getClass().getDeclaredFields()).map(field -> {
+            final Object[] test = Arrays.stream(it.getClass().getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(CsvProperty.class))
+                    .map(field -> {
                 try {
                     field.setAccessible(true);
-//                    final var fieldClass = field.getType();
+                    final var fieldValue = field.get(it);
                     final var deserializerFunction = (DeserializerFunction)getDeserializerFunction(field);
-                    return deserializerFunction.deserialize(field.get(it));
+                    return nonNull(fieldValue)
+                            ? deserializerFunction.deserialize(field.get(it))
+                            : null;
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }

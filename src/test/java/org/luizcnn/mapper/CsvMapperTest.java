@@ -47,6 +47,25 @@ class CsvMapperTest {
   }
 
   @Test
+  public void shouldConvertObjectsWithNotMappedPropertiesToCSV() {
+    //arrange
+    final var firstPerson = buildPerson(
+            "joaozinho", 19, BigDecimal.valueOf(10.21), true, LocalDate.of(2004,2,23)
+    );
+    final var secondPerson = buildPerson(
+            "maria", 34, BigDecimal.valueOf(42.23), false, LocalDate.of(1989,3,1)
+    );
+    final var expectedPersons = List.of(firstPerson, secondPerson);
+    final var expectedCSV = readCsvFrom(TEST_DATA_PATH, "person.csv");
+
+    //act
+    final var csvContent = CsvMapper.getInstance().writeValueAsString(expectedPersons);
+
+    //asserts
+    assertThat(csvContent).isEqualToIgnoringNewLines(expectedCSV);
+  }
+
+  @Test
   public void shouldMapCsvWithinDataOfPersonsIntoAListOfPersonBrazilianBirthdateModel() {
     //arrange
     final var firstPerson = BrazilianPerson
@@ -98,6 +117,8 @@ class CsvMapperTest {
 
   private static void assertPersons(Person expectedPerson, Person person) {
     assertEquals(expectedPerson.getName(), person.getName());
+    assertEquals(expectedPerson.getBirthDate(), person.getBirthDate());
+    assertEquals(expectedPerson.getEmail(), person.getEmail());
     assertEquals(expectedPerson.getAge(), person.getAge());
     assertEquals(expectedPerson.getId(), person.getId());
     assertEquals(expectedPerson.getBalance(), person.getBalance());
