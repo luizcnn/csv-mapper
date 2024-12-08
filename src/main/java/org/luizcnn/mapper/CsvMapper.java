@@ -2,12 +2,19 @@ package org.luizcnn.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.luizcnn.annotations.CsvProperty;
 import org.luizcnn.exceptions.MissingNoArgsConstructorException;
+import org.luizcnn.strategy.DeserializerFunction;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +22,8 @@ import java.util.stream.Stream;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.luizcnn.csvparser.CsvParser.parseCsvAsListOfMap;
-import static org.luizcnn.strategy.ParserFunctionStrategy.getParserFunction;
+import static org.luizcnn.strategy.SerializerFunctionStrategy.getSerializerFunction;
+import static org.luizcnn.strategy.DeserializerFunctionStrategy.getDeserializerFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CsvMapper {
@@ -26,7 +34,7 @@ public class CsvMapper {
     return INSTANCE;
   }
 
-  public <T> List<T> process(String csv, Class<T> targetClass) {
+  public <T> List<T> fromCSV(String csv, Class<T> targetClass) {
     List<T> result = new ArrayList<>();
 
     final var csvAsList = parseCsvAsListOfMap(csv);
@@ -48,6 +56,46 @@ public class CsvMapper {
     });
 
     return result;
+  }
+
+  public <T> String writeValueAsString(Collection<T> value) {
+    if (nonNull(value) && !value.isEmpty()) {
+      final var mapperHelper = getMapperHelper(value.stream().findAny().get().getClass());
+      StringWriter sw = new StringWriter();
+      final var csvFormat = CSVFormat.DEFAULT
+              .builder()
+              .setHeader(mapperHelper.stream().map(it -> {
+                final var csvHeaderAnnotation = (CsvProperty) it.getAnnotation();
+                final var field = it.getField();
+                return isCsvHeaderNameNullOrBlank(csvHeaderAnnotation)
+                        ? field.getName()
+                        : csvHeaderAnnotation.name();
+              }).toArray(String[]::new))
+              .build();
+
+      try (final CSVPrinter printer = new CSVPrinter(sw, csvFormat)) {
+        value.forEach(it -> {
+          try {
+            final Object[] test = Arrays.stream(it.getClass().getDeclaredFields()).map(field -> {
+                try {
+                    field.setAccessible(true);
+//                    final var fieldClass = field.getType();
+                    final var deserializerFunction = (DeserializerFunction)getDeserializerFunction(field);
+                    return deserializerFunction.deserialize(field.get(it));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toArray(Object[]::new);
+            printer.printRecord(test);
+        } catch (IOException e) {
+              throw new RuntimeException(e);
+          }});
+      } catch (IOException e) {
+        System.out.println(e.getMessage());;
+      }
+      return sw.toString();
+    }
+    return null;
   }
 
   private static <T> List<MapperHelper> getMapperHelper(Class<T> targetClass) {
@@ -86,7 +134,7 @@ public class CsvMapper {
   private static <T> void setFieldValueIntoMappedObject(T mappedObject, Field field, String value) {
     try {
       field.setAccessible(true);
-      field.set(mappedObject, getParserFunction(field).parse(value));
+      field.set(mappedObject, getSerializerFunction(field).serialize(value));
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

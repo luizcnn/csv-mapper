@@ -5,8 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.luizcnn.annotations.CsvProperty;
-import org.luizcnn.annotations.CsvPropertyParser;
-import org.luizcnn.customparsers.BrazilianLocalDateParser;
+import org.luizcnn.annotations.CsvPropertyDeserializer;
+import org.luizcnn.annotations.CsvPropertySerializer;
+import org.luizcnn.customparsers.BrazilianLocalDateDeserializer;
+import org.luizcnn.customparsers.BrazilianLocalDateSerializer;
 
 import java.time.LocalDate;
 
@@ -20,7 +22,8 @@ public class BrazilianPerson {
   private String name;
 
   @CsvProperty(name = "dataNascimento")
-  @CsvPropertyParser(using = BrazilianLocalDateParser.class)
+  @CsvPropertySerializer(using = BrazilianLocalDateSerializer.class)
+  @CsvPropertyDeserializer(using = BrazilianLocalDateDeserializer.class)
   private LocalDate birthDate;
 
 }

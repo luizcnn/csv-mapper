@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -32,7 +33,7 @@ class CsvMapperTest {
     final var csvContent = readCsvFrom(TEST_DATA_PATH, "person.csv");
 
     //act
-    final var persons = CsvMapper.getInstance().process(csvContent, Person.class);
+    final var persons = CsvMapper.getInstance().fromCSV(csvContent, Person.class);
 
     //asserts
     assertNotNull(persons);
@@ -40,6 +41,7 @@ class CsvMapperTest {
     for (int i = 0; i < persons.size(); i++) {
       final var expectedPerson = expectedPersons.get(i);
       final var person = persons.get(i);
+
       assertPersons(expectedPerson, person);
     }
   }
@@ -61,7 +63,7 @@ class CsvMapperTest {
     final var csvContent = readCsvFrom(TEST_DATA_PATH, "brazilian-person.csv");
 
     //act
-    final var persons = CsvMapper.getInstance().process(csvContent, BrazilianPerson.class);
+    final var persons = CsvMapper.getInstance().fromCSV(csvContent, BrazilianPerson.class);
 
     //asserts
     assertNotNull(persons);
@@ -72,6 +74,26 @@ class CsvMapperTest {
       assertEquals(expectedPerson.getName(), person.getName());
       assertEquals(expectedPerson.getBirthDate(), person.getBirthDate());
     }
+  }
+
+  @Test
+  public void shouldMapACollectionOfObjectToACSVString() {
+    //arrange
+    final var firstPerson = BrazilianPerson
+            .builder()
+            .name("joaozinho")
+            .birthDate(LocalDate.of(2004,2,23))
+            .build();
+    final var secondPerson = BrazilianPerson
+            .builder()
+            .name("maria")
+            .birthDate(LocalDate.of(1989,3,1))
+            .build();
+    final var expectedCSV = readCsvFrom(TEST_DATA_PATH, "brazilian-person.csv");
+
+    //act
+    final var csvContent = CsvMapper.getInstance().writeValueAsString(List.of(firstPerson, secondPerson));
+    assertThat(csvContent).isEqualToIgnoringNewLines(expectedCSV);
   }
 
   private static void assertPersons(Person expectedPerson, Person person) {

@@ -1,7 +1,6 @@
 package org.luizcnn.strategy;
 
-import org.luizcnn.annotations.CsvPropertyParser;
-import org.luizcnn.strategy.factory.DefaultParserFactory;
+import org.luizcnn.annotations.CsvPropertyDeserializer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -9,11 +8,11 @@ import java.lang.reflect.InvocationTargetException;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
-public class ParserFunctionStrategy {
+public class DeserializerFunctionStrategy {
 
-  public static ParserFunction<?> getParserFunction(Field field) {
-    final var parser = ofNullable(field.getDeclaredAnnotation(CsvPropertyParser.class))
-            .map(CsvPropertyParser::using)
+  public static DeserializerFunction<?> getDeserializerFunction(Field field) {
+    final var parser = ofNullable(field.getDeclaredAnnotation(CsvPropertyDeserializer.class))
+            .map(CsvPropertyDeserializer::using)
             .orElse(null);
     if (nonNull(parser)) {
       try {
@@ -24,7 +23,12 @@ public class ParserFunctionStrategy {
         throw new RuntimeException(e);
       }
     }
-    return DefaultParserFactory.getByFieldType(field.getType());
+    return new DeserializerFunction<>() {
+        @Override
+        public String deserialize(Object value) {
+            return DeserializerFunction.super.deserialize(value);
+        }
+    };
   }
 
 }

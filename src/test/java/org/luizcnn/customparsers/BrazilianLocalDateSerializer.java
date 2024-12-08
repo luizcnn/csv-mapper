@@ -1,14 +1,14 @@
 package org.luizcnn.customparsers;
 
-import org.luizcnn.strategy.ParserFunction;
+import org.luizcnn.strategy.SerializerFunction;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class BrazilianLocalDateParser implements ParserFunction<LocalDate> {
+public class BrazilianLocalDateSerializer implements SerializerFunction<LocalDate> {
 
   @Override
-  public LocalDate parse(String value) {
+  public LocalDate serialize(String value) {
     return LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
   }
 

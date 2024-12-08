@@ -1,16 +1,16 @@
 package org.luizcnn.strategy.factory;
 
 import org.luizcnn.exceptions.ParserNotFoundException;
-import org.luizcnn.strategy.ParserFunction;
-import org.luizcnn.strategy.parsers.BigDecimalParser;
-import org.luizcnn.strategy.parsers.BooleanParser;
-import org.luizcnn.strategy.parsers.DoubleParser;
-import org.luizcnn.strategy.parsers.FloatParser;
-import org.luizcnn.strategy.parsers.IntegerParser;
-import org.luizcnn.strategy.parsers.LocalDateParser;
-import org.luizcnn.strategy.parsers.LocalDateTimeParser;
-import org.luizcnn.strategy.parsers.StringParser;
-import org.luizcnn.strategy.parsers.UUIDParser;
+import org.luizcnn.strategy.SerializerFunction;
+import org.luizcnn.strategy.serializers.BigDecimalSerializer;
+import org.luizcnn.strategy.serializers.BooleanSerializer;
+import org.luizcnn.strategy.serializers.DoubleSerializer;
+import org.luizcnn.strategy.serializers.FloatSerializer;
+import org.luizcnn.strategy.serializers.IntegerSerializer;
+import org.luizcnn.strategy.serializers.LocalDateSerializer;
+import org.luizcnn.strategy.serializers.LocalDateTimeSerializer;
+import org.luizcnn.strategy.serializers.StringSerializer;
+import org.luizcnn.strategy.serializers.UUIDSerializer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,25 +19,25 @@ import java.util.UUID;
 
 public final class DefaultParserFactory {
 
-  public static ParserFunction<?> getByFieldType(Class<?> fieldType) {
+  public static SerializerFunction<?> getByFieldType(Class<?> fieldType) {
     if (String.class.equals(fieldType)) {
-      return StringParser.getInstance();
+      return StringSerializer.getInstance();
     } else if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
-      return IntegerParser.getInstance();
+      return IntegerSerializer.getInstance();
     } else if (Double.class.equals(fieldType) || double.class.equals(fieldType)) {
-      return DoubleParser.getInstance();
+      return DoubleSerializer.getInstance();
     } else if (Float.class.equals(fieldType) || float.class.equals(fieldType)) {
-      return FloatParser.getInstance();
+      return FloatSerializer.getInstance();
     } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
-      return BooleanParser.getInstance();
+      return BooleanSerializer.getInstance();
     } else if (UUID.class.equals(fieldType)) {
-      return UUIDParser.getInstance();
+      return UUIDSerializer.getInstance();
     } else if (BigDecimal.class.equals(fieldType)) {
-      return BigDecimalParser.getInstance();
+      return BigDecimalSerializer.getInstance();
     } else if (LocalDate.class.equals(fieldType)) {
-      return LocalDateParser.getInstance();
+      return LocalDateSerializer.getInstance();
     } else if (LocalDateTime.class.equals(fieldType)) {
-      return LocalDateTimeParser.getInstance();
+      return LocalDateTimeSerializer.getInstance();
     } else {
       throw new ParserNotFoundException(
               String.format(
